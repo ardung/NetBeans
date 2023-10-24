@@ -128,9 +128,9 @@
                   <Component id="test4" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="jLabel7" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace type="separate" max="-2" attributes="0"/>
-              <Component id="jScrollPane1" min="-2" pref="149" max="-2" attributes="0"/>
-              <EmptySpace pref="50" max="32767" attributes="0"/>
+              <EmptySpace min="-2" pref="33" max="-2" attributes="0"/>
+              <Component id="jScrollPane1" min="-2" pref="151" max="-2" attributes="0"/>
+              <EmptySpace pref="33" max="32767" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -185,6 +185,9 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="test1">
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="test1ActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="test2">
     </Component>
@@ -196,21 +199,33 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Add"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="addButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="listButton">
       <Properties>
         <Property name="text" type="java.lang.String" value="List"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="listButtonActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="studentAverage">
       <Properties>
         <Property name="text" type="java.lang.String" value="Student Average"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="studentAverageActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JButton" name="courseAverage">
       <Properties>
         <Property name="text" type="java.lang.String" value="Course Average"/>
       </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="courseAverageActionPerformed"/>
+      </Events>
     </Component>
     <Container class="javax.swing.JScrollPane" name="jScrollPane1">
       <AuxValues>

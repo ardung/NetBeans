@@ -68,13 +68,39 @@ public class TwoDimensionArray extends javax.swing.JFrame {
 
         jLabel7.setText("Test 4");
 
+        test1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                test1ActionPerformed(evt);
+            }
+        });
+
         addButton.setText("Add");
+        addButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                addButtonActionPerformed(evt);
+            }
+        });
 
         listButton.setText("List");
+        listButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                listButtonActionPerformed(evt);
+            }
+        });
 
         studentAverage.setText("Student Average");
+        studentAverage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                studentAverageActionPerformed(evt);
+            }
+        });
 
         courseAverage.setText("Course Average");
+        courseAverage.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                courseAverageActionPerformed(evt);
+            }
+        });
 
         outArea.setEditable(false);
         outArea.setColumns(20);
@@ -165,13 +191,108 @@ public class TwoDimensionArray extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(test4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(jLabel7))
-                .addGap(18, 18, 18)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 149, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(50, Short.MAX_VALUE))
+                .addGap(33, 33, 33)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 151, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(33, Short.MAX_VALUE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void addButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_addButtonActionPerformed
+        // TODO add your handling code here:
+        String firstN = firstName.getText().strip();
+        String lastN = lastName.getText().strip();
+        String grade1 = test1.getText();
+        String grade2 = test2.getText();
+        String grade3 = test3.getText();
+        String grade4 = test4.getText();
+        Boolean add = true; 
+        try {
+            Double.valueOf(grade1);
+            Double.valueOf(grade2);
+            Double.valueOf(grade3);
+            Double.valueOf(grade4);
+        if (index !=0){
+            for(int i=0; i<index;i++){
+                if(studentGrade[i][0].equals(firstN) && studentGrade[i][1].equals(lastN)){
+                    outArea.setText("Duplicate names present.");
+                    add = false;
+                    break;
+                }
+            }
+        }
+        if (firstName.getText().isEmpty() || lastName.getText().isEmpty() || test1.getText().isEmpty() || test2.getText().isEmpty() || test3.getText().isEmpty() || test4.getText().isEmpty()){
+            outArea.setText("Please fill out all fields.");
+            add = false; 
+        } if (add && index<30){
+            studentGrade[index][0] = firstN;
+            studentGrade[index][1] = lastN;
+            studentGrade[index][2] = grade1;
+            studentGrade[index][3] = grade2;
+            studentGrade[index][4] = grade3;
+            studentGrade[index][5] = grade4;
+            index++;
+            outArea.setText("");
+        } else if(index>=30){
+            outArea.setText("The class is at capacity.");
+        }
+    }catch(NumberFormatException e){
+        outArea.setText("One of the grades is not a number.");
+        add = false;
+    }
+    }//GEN-LAST:event_addButtonActionPerformed
+
+    private void test1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_test1ActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_test1ActionPerformed
+
+    private void listButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_listButtonActionPerformed
+        // TODO add your handling code here:
+        String out = "";
+        for(int i =0; i<index;i++){
+            for(int j=0; j<6;j++){
+                out += studentGrade[i][j]+" || ";
+            }
+            out += "\n";
+        }
+        outArea.setText(out);
+    }//GEN-LAST:event_listButtonActionPerformed
+
+    private void studentAverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_studentAverageActionPerformed
+        // TODO add your handling code here:
+        String firstN = firstName.getText().strip();
+        String lastN = lastName.getText().strip();
+        String name;
+        double avg = 0;
+        Boolean check = true;
+        for(int i=0; i<index;i++){
+            if(studentGrade[i][0].equals(firstN) && studentGrade[i][1].equals(lastN)){
+                name = studentGrade[i][0]+" "+studentGrade[i][1];
+                for(int a = 2; a<6;a++){
+                    avg += Double.valueOf(studentGrade[i][a]);
+                    check=false;
+                    }
+                outArea.setText(name+"'s average is "+avg/4.0+"%.");
+                break;
+                }
+        } if(check){
+            outArea.setText("That name is not in databse.");
+        }
+    }//GEN-LAST:event_studentAverageActionPerformed
+
+    private void courseAverageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_courseAverageActionPerformed
+        // TODO add your handling code here:
+        double avg = 0;
+        double count = 0;
+        for(int i=0; i<index;i++){
+            for(int j = 2; j<6;j++){
+                avg+=Double.valueOf(studentGrade[i][j]);
+                count+=1;
+            }
+        }
+        outArea.setText("The course average is "+avg/count+"%.");
+    }//GEN-LAST:event_courseAverageActionPerformed
 
     /**
      * @param args the command line arguments
