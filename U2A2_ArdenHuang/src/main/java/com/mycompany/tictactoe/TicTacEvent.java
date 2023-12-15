@@ -3,9 +3,10 @@
 
 import javax.swing.*;
 import java.awt.event.*;
-import java.awt.*;
+import java.io.*;
 
 public class TicTacEvent implements ItemListener, ActionListener, Runnable {
+    File save = new File("save.txt");
     TicTac gui;
     Thread playing;
     ImageIcon a = new ImageIcon("x.png");
