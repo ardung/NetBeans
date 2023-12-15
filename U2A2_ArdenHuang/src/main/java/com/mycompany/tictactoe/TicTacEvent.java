@@ -4,9 +4,9 @@
 import javax.swing.*;
 import java.awt.event.*;
 import java.io.*;
+import java.util.*;
 
 public class TicTacEvent implements ItemListener, ActionListener, Runnable {
-    File save = new File("save.txt");
     TicTac gui;
     Thread playing;
     ImageIcon a = new ImageIcon("x.png");
@@ -99,6 +99,19 @@ public class TicTacEvent implements ItemListener, ActionListener, Runnable {
            b16();
        }
     }
+     void writeToFile(String newLine){
+         try {
+        FileWriter myWriter = new FileWriter("save.txt", true);
+        myWriter.write(newLine);
+        myWriter.close();
+    } catch (IOException e) {
+        System.out.println("An error occurred while writing.");
+        e.printStackTrace();
+        }
+     }
+     void readFromFile(){
+         
+     }
      void b1() {
         clicks = clicks + 1;
         if ((clicks%2)==1){
