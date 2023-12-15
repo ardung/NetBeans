@@ -12,32 +12,37 @@ import java.awt.*;
 import javax.swing.*;
 
 public class TicTac extends JFrame {
+    Font f1 = new Font(Font.SERIF, Font.PLAIN,0); //invis font
     TicTacEvent tictac = new TicTacEvent(this);
     JPanel row1 = new JPanel();
     JButton[][] boxes = new JButton[4][4];
     JButton play = new JButton("Play");
-    JTextField blank1 = new JTextField();
+    JLabel blank1 = new JLabel("",SwingConstants.CENTER);
     JButton reset = new JButton("Reset");
-    JTextField blank3 = new JTextField();
-    JOptionPane win = new JOptionPane("Winner");
+    JLabel blank3 = new JLabel("",SwingConstants.CENTER);
     ImageIcon back = new ImageIcon("cardback.jpg ");
+    
 
     public TicTac() {
         super("Tic Tac Toe");
-        setSize(750, 600);
+        setLocationRelativeTo(null);
+        setSize(750, 700);
+        setLocationRelativeTo(null); //centers window on launch
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         FlowLayout layout = new FlowLayout();
         setLayout(layout);
         int name = 0;
         String newname;
 
-        GridLayout layout1 = new GridLayout(5, 4, 10, 10);
+        GridLayout layout1 = new GridLayout(5, 4, 10, 10); //sets grid layout
         row1.setLayout(layout1);
         for (int x = 0; x <= 3; x++) {
             for (int y = 0; y <= 3; y++) {
                 name = name + 1;
-                newname = Integer.toString(name);
+                newname = Integer.toString(name); //names the buttons
                 boxes[x][y] = new JButton(newname);
+                boxes[x][y].setFont(f1); //sets button names invisible
+                boxes[x][y].setEnabled(false); //disables buttons
                 boxes[x][y].setIcon(back);
                 row1.add(boxes[x][y]);
             }
@@ -47,7 +52,7 @@ public class TicTac extends JFrame {
         row1.add(reset);
         row1.add(blank3);
         add(row1);
-         play.addActionListener(tictac);
+         play.addActionListener(tictac); //adding listeners
          reset.addActionListener(tictac);
         for (int x=0; x<=3; x++){
             for (int y=0; y<=3; y++){
@@ -58,6 +63,6 @@ public class TicTac extends JFrame {
     }
 
     public static void main(String[] arguments) {
-        TicTac frame = new TicTac();
+        TicTac frame = new TicTac(); //frame for the event
     }
 }
