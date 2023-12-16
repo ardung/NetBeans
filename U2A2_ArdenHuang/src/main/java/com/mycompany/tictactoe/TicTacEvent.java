@@ -118,7 +118,7 @@ public class TicTacEvent implements ItemListener, ActionListener, Runnable {
     }
      void updateFile(){ //updates file with game info
          try {
-        FileWriter pw = new FileWriter("winsTracker",false);
+        FileWriter pw = new FileWriter("winsTracker.txt",false);
         pw.write(String.valueOf(stats[0])+" "+String.valueOf(stats[1])+" "+String.valueOf(stats[2]));
         pw.close();
     } catch (IOException e) {
