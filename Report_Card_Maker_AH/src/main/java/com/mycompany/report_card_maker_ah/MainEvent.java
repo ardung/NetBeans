@@ -4,15 +4,15 @@
  */
 package com.mycompany.report_card_maker_ah;
 import java.util.*;
-import java.awt.*;
 import java.io.*;
+
 /**
  *
  * @author 342513926
  */
 public class MainEvent extends javax.swing.JFrame {
     String c1, c2, c3, c4, grade, fName, lName, fullName;
-  
+    ArrayList<ArrayList<ArrayList<String>>> data = new ArrayList<>(1);
     
 
     /**
@@ -72,6 +72,7 @@ public class MainEvent extends javax.swing.JFrame {
         saveButton = new javax.swing.JButton();
         jScrollPane1 = new javax.swing.JScrollPane();
         studentList = new javax.swing.JList<>();
+        jButton1 = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Report Cards");
@@ -176,12 +177,10 @@ public class MainEvent extends javax.swing.JFrame {
             }
         });
 
-        studentList.setModel(new javax.swing.AbstractListModel<String>() {
-            String[] strings = new String[];
-            public int getSize() { return strings.length; }
-            public String getElementAt(int i) { return strings[i]; }
-        });
         jScrollPane1.setViewportView(studentList);
+
+        jButton1.setText("New Student");
+        jButton1.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -192,6 +191,8 @@ public class MainEvent extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(saveButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jButton1)
                         .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -353,7 +354,9 @@ public class MainEvent extends javax.swing.JFrame {
                     .addComponent(c4CalcButton)
                     .addComponent(c4MedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addComponent(saveButton)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(saveButton)
+                    .addComponent(jButton1))
                 .addContainerGap())
         );
 
@@ -463,6 +466,7 @@ public class MainEvent extends javax.swing.JFrame {
     private javax.swing.JTextField c4ScoreField;
     private javax.swing.JTextField fNameField;
     private javax.swing.JTextField gradeField;
+    private javax.swing.JButton jButton1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
