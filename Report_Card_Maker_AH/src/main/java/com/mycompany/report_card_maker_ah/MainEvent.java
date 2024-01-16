@@ -5,12 +5,14 @@
 package com.mycompany.report_card_maker_ah;
 import java.util.*;
 import java.io.*;
+import javax.swing.*;
 
 /**
  *
  * @author 342513926
  */
 public class MainEvent extends javax.swing.JFrame {
+    JFrame calculator = new JFrame("Calculator");
     String c1, c2, c3, c4, grade, fName, lName, fullName;
     int index=0;
     String[][] data;
@@ -406,6 +408,9 @@ public class MainEvent extends javax.swing.JFrame {
 
     private void c1CalcButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c1CalcButtonActionPerformed
         // TODO add your handling code here:
+        calculator.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
+        calculator.setSize(155,800);
+        calculator.setVisible(true);
     }//GEN-LAST:event_c1CalcButtonActionPerformed
 
     private void c2NameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c2NameFieldActionPerformed
