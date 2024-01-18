@@ -43,33 +43,47 @@ public class MainEvent extends javax.swing.JFrame {
         calculator.setLayout(flowLayout);
         calculator.setVisible(true);
         for(int x = 0; x<5; x++){
-            boxes.add(new ArrayList<JTextField>());
+            boxes.add(new ArrayList<>());
             for(int y = 0;y<2; y++){
                 boxes.get(x).add(new JTextField(5));
                 calculator.add(boxes.get(x).get(y));
             }
         }
         
-        add.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                boxes.add(new ArrayList<JTextField>());
-                add.setVisible(false);
-                result.setVisible(false);
-                calculate.setVisible(false);
-                for(int i = 0;i<2;i++){
-                    boxes.get(boxes.size()-1).add(new JTextField(5));
-                    calculator.add(boxes.get(boxes.size()-1).get(i));
+        add.addActionListener((ActionEvent e) -> {
+            boxes.add(new ArrayList<>());
+            add.setVisible(false);
+            result.setVisible(false);
+            calculate.setVisible(false);
+            for(int i = 0;i<2;i++){
+                boxes.get(boxes.size()-1).add(new JTextField(5));
+                calculator.add(boxes.get(boxes.size()-1).get(i));
+            }
+            add.setVisible(true);
+            result.setVisible(true);
+            calculate.setVisible(true);
+            int h = calculator.getHeight();
+            calculator.setSize(200,h+=33);
+        });
+        calculate.addActionListener((ActionEvent e) -> {
+            int size = boxes.size(); 
+            int weightTotal=0;
+            for (int i=0;i<size;i++){
+                String gradeString,weightString;
+                int grade;
+                int weight ;
+                if (boxes.get(i).get(0).getText().isEmpty() || 
+                        boxes.get(i).get(1).getText().isEmpty()){
+                        break;
                 }
-                add.setVisible(true);
-                result.setVisible(true);
-                calculate.setVisible(true);
-                int h = calculator.getHeight();
-                calculator.setSize(200,h+=33);
+                gradeString = boxes.get(i).get(0).getText();
+                grade = Integer.parseInt(gradeString);
+                weightString = boxes.get(i).get(1).getText();
+                weight = Integer.parseInt(weightString);
+                weightTotal+=weight;
                 
             }
         });
-
-        
         
     }
     public MainEvent() {
