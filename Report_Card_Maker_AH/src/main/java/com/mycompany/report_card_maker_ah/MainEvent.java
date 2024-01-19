@@ -3,13 +3,10 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
  */
 package com.mycompany.report_card_maker_ah;
-import java.util.*;
-import java.io.*;
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-
+import java.util.*;
+import javax.swing.*;
 /**
  *
  * @author 342513926
@@ -17,24 +14,27 @@ import java.awt.event.ActionListener;
 public class MainEvent extends javax.swing.JFrame {
     String c1, c2, c3, c4, grade, fName, lName, fullName;
     int index=0;
-    String[][] data;
+    ArrayList<ArrayList<String>> data = new ArrayList<>();
+    
     
 
     /**
      * Creates new form NewJFrame
      */
-    public static void Calculator(){
+    @SuppressWarnings("empty-statement")
+    public static void Calculator(int ind){
         ArrayList<ArrayList<JTextField>> boxes = new ArrayList<>();
         JFrame calculator = new JFrame("");
         calculator.setResizable(false);
         JButton add = new JButton("Add");
         JButton calculate = new JButton("Calculate");
         JTextField result = new JTextField("",10);
+        result.setFocusable(false);
         result.setEditable(false);
         calculator.add(calculate);
         calculator.add(add);
         calculator.add(result);
-        calculator.add(new JLabel("  Grade      ",SwingConstants.LEFT));
+        calculator.add(new JLabel(" Grade      ",SwingConstants.LEFT));
         calculator.add(new JLabel("    Weight",SwingConstants.RIGHT));
         calculator.setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
         int width = 200, height = 300;
@@ -49,7 +49,6 @@ public class MainEvent extends javax.swing.JFrame {
                 calculator.add(boxes.get(x).get(y));
             }
         }
-        
         add.addActionListener((ActionEvent e) -> {
             boxes.add(new ArrayList<>());
             add.setVisible(false);
@@ -65,26 +64,56 @@ public class MainEvent extends javax.swing.JFrame {
             int h = calculator.getHeight();
             calculator.setSize(200,h+=33);
         });
-        calculate.addActionListener((ActionEvent e) -> {
+        calculate.addActionListener((ActionEvent a) -> {
+            try{
             int size = boxes.size(); 
-            int weightTotal=0;
+            double weightTotal=0;
+            double finalGrade=0;
+            boolean valid = true;
             for (int i=0;i<size;i++){
                 String gradeString,weightString;
-                int grade;
-                int weight ;
+                double grade;
+                double weight;
                 if (boxes.get(i).get(0).getText().isEmpty() || 
                         boxes.get(i).get(1).getText().isEmpty()){
                         break;
+                }else{
+                    gradeString = boxes.get(i).get(0).getText();
+                    grade = Double.parseDouble(gradeString);
+                    weightString = boxes.get(i).get(1).getText();
+                    weight = Double.parseDouble(weightString);
                 }
-                gradeString = boxes.get(i).get(0).getText();
-                grade = Integer.parseInt(gradeString);
-                weightString = boxes.get(i).get(1).getText();
-                weight = Integer.parseInt(weightString);
                 weightTotal+=weight;
+                finalGrade += grade*(weight/100.0);
+                if (weightTotal>100){
+                    valid = false;
+                    break;
+                }
                 
             }
+            if (weightTotal<100){
+                finalGrade+= 100*((100-weightTotal)/100);
+            }
+            finalGrade = (Math.round(finalGrade*10))/10.0;
+            if (valid){
+                result.setText(Double.toString(finalGrade));
+                switch (ind) {
+                    case 1 -> c1ScoreField.setText(Double.toString(finalGrade));
+                    case 2 -> c2ScoreField.setText(Double.toString(finalGrade));
+                    case 3 -> c3ScoreField.setText(Double.toString(finalGrade));
+                    case 4 -> c4ScoreField.setText(Double.toString(finalGrade));
+                    default -> {
+                    }
+                }
+            }else{
+                result.setText("Invalid data");
+            }
+            }
+            catch(NumberFormatException e){
+                result.setText("Invalid data");
+            }
         });
-        
+       
     }
     public MainEvent() {
         initComponents();
@@ -138,10 +167,9 @@ public class MainEvent extends javax.swing.JFrame {
         c2MedField = new javax.swing.JTextField();
         c2CommentField = new javax.swing.JTextField();
         saveButton = new javax.swing.JButton();
-        jScrollPane1 = new javax.swing.JScrollPane();
-        studentList = new javax.swing.JList<>();
         newStudent = new javax.swing.JButton();
         search = new javax.swing.JButton();
+        studentDoesNotExist = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Report Cards");
@@ -246,8 +274,6 @@ public class MainEvent extends javax.swing.JFrame {
             }
         });
 
-        jScrollPane1.setViewportView(studentList);
-
         newStudent.setText("New Student");
         newStudent.setEnabled(false);
         newStudent.addActionListener(new java.awt.event.ActionListener() {
@@ -262,6 +288,10 @@ public class MainEvent extends javax.swing.JFrame {
                 searchActionPerformed(evt);
             }
         });
+
+        studentDoesNotExist.setForeground(new java.awt.Color(255, 51, 51));
+        studentDoesNotExist.setText("Student does not exist.");
+        studentDoesNotExist.setVisible(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -278,6 +308,35 @@ public class MainEvent extends javax.swing.JFrame {
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel11)
+                                    .addComponent(jLabel10)
+                                    .addComponent(jLabel3))
+                                .addGap(7, 7, 7)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(gradeField, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                    .addComponent(studentNumberField, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                                    .addComponent(lNameField)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel2)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(fNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(187, 187, 187))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(search)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(studentDoesNotExist)
+                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
                                 .addGap(80, 80, 80)
                                 .addComponent(jLabel8)
                                 .addGap(50, 50, 50)
@@ -287,89 +346,57 @@ public class MainEvent extends javax.swing.JFrame {
                                 .addGap(74, 74, 74)
                                 .addComponent(jLabel13))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel2)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(fNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                            .addComponent(jLabel11)
-                                            .addComponent(jLabel10)
-                                            .addComponent(jLabel3))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(lNameField, javax.swing.GroupLayout.DEFAULT_SIZE, 72, Short.MAX_VALUE)
-                                            .addComponent(gradeField)
-                                            .addComponent(studentNumberField))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                    .addComponent(jLabel4)
+                                    .addComponent(jLabel5)
+                                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addGap(0, 0, Short.MAX_VALUE)
-                                        .addComponent(jLabel1)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
-                                    .addGroup(layout.createSequentialGroup()
+                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                        .addComponent(c4NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(c4ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(c4MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(c4CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(search)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
-                                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 169, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                        .addComponent(c4CalcButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
                                     .addGroup(layout.createSequentialGroup()
-                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                            .addComponent(jLabel4)
-                                            .addComponent(jLabel5)
-                                            .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING))
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                .addComponent(c4NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 121, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(c2NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(12, 12, 12)
+                                                .addComponent(c2ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(c4ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(c2MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                                .addComponent(c1NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                                .addGap(12, 12, 12)
+                                                .addComponent(c1ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(c4MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(c4CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addComponent(c4CalcButton, javax.swing.GroupLayout.PREFERRED_SIZE, 71, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                            .addGroup(layout.createSequentialGroup()
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                        .addComponent(c2NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addGap(12, 12, 12)
-                                                        .addComponent(c2ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                        .addComponent(c2MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addGap(0, 0, 0))
-                                                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                                        .addComponent(c1NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addGap(12, 12, 12)
-                                                        .addComponent(c1ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                        .addComponent(c1MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                    .addComponent(c2CommentField, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
-                                                    .addComponent(c1CommentField))
-                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                                    .addComponent(c1CalcButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                                    .addComponent(c2CalcButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
-                                    .addGroup(layout.createSequentialGroup()
-                                        .addComponent(jLabel6)
+                                                .addComponent(c1MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(c2CommentField, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
+                                            .addComponent(c1CommentField))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(c3NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(c3ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(c3MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(c3CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                        .addComponent(c3CalcButton, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                            .addComponent(c1CalcButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                            .addComponent(c2CalcButton, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jLabel6)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(c3NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(c3ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(c3MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(c3CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(c3CalcButton, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {c1CalcButton, c2CalcButton, c3CalcButton, c4CalcButton});
@@ -377,37 +404,32 @@ public class MainEvent extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel1)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(fNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel2)
-                            .addComponent(search))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel3)
-                            .addComponent(lNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(jLabel10)
-                                    .addComponent(gradeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                    .addComponent(studentNumberField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                    .addComponent(jLabel11)))))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 160, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addComponent(jLabel1)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(fNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel2)
+                    .addComponent(search)
+                    .addComponent(studentDoesNotExist))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jLabel3)
+                    .addComponent(lNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel10)
+                            .addComponent(gradeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(studentNumberField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel11))))
+                .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                        .addComponent(jLabel8, javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jLabel9, javax.swing.GroupLayout.Alignment.TRAILING))
+                    .addComponent(jLabel8)
+                    .addComponent(jLabel9)
                     .addComponent(jLabel12)
                     .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.LEADING))
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -462,7 +484,7 @@ public class MainEvent extends javax.swing.JFrame {
 
     private void c3CalcButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c3CalcButtonActionPerformed
         // TODO add your handling code here:
-        Calculator();
+        Calculator(3);
     }//GEN-LAST:event_c3CalcButtonActionPerformed
 
     private void c4NameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c4NameFieldActionPerformed
@@ -471,7 +493,7 @@ public class MainEvent extends javax.swing.JFrame {
 
     private void c4CalcButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c4CalcButtonActionPerformed
         // TODO add your handling code here:
-        Calculator();
+        Calculator(4);
     }//GEN-LAST:event_c4CalcButtonActionPerformed
 
     private void c1NameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c1NameFieldActionPerformed
@@ -480,7 +502,7 @@ public class MainEvent extends javax.swing.JFrame {
 
     private void c1CalcButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c1CalcButtonActionPerformed
         // TODO add your handling code here:
-        Calculator();
+        Calculator(1);
     }//GEN-LAST:event_c1CalcButtonActionPerformed
 
     private void c2NameFieldActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c2NameFieldActionPerformed
@@ -489,11 +511,12 @@ public class MainEvent extends javax.swing.JFrame {
 
     private void c2CalcButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_c2CalcButtonActionPerformed
         // TODO add your handling code here:
-        Calculator();
+        Calculator(2);
     }//GEN-LAST:event_c2CalcButtonActionPerformed
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         // TODO add your handling code here:
+        data.add(new ArrayList<>());
         c1 = c1NameField.getText();
         c2 = c2NameField.getText();
         c3 = c3NameField.getText();
@@ -502,6 +525,19 @@ public class MainEvent extends javax.swing.JFrame {
         fName = fNameField.getText();
         lName = lNameField.getText();
         fullName = fName.strip() + " " + lName.strip();
+        data.get(index).add(0, fullName);
+        data.get(index).add(1, studentNumberField.getText());
+        data.get(index).add(2, c1ScoreField.getText());
+        data.get(index).add(3,c1CommentField.getText());
+        data.get(index).add(4,c2ScoreField.getText());
+        data.get(index).add(5,c2CommentField.getText());
+        data.get(index).add(6,c3ScoreField.getText());
+        data.get(index).add(7,c3CommentField.getText());
+        data.get(index).add(8,c4ScoreField.getText());
+        data.get(index).add(9, c4CommentField.getText());
+        newStudent.setEnabled(true);
+        
+        
         
         
         
@@ -512,21 +548,33 @@ public class MainEvent extends javax.swing.JFrame {
         fName = fNameField.getText();
         lName = lNameField.getText();
         fullName = fName.strip() + " " + lName.strip();
-        data[index][0] = fullName;
-        data[index][1] = studentNumberField.getText();
-        data[index][2] = c1ScoreField.getText();
-        data[index][3] = c1CommentField.getText();
-        data[index][4] = c2ScoreField.getText();
-        data[index][5] = c2CommentField.getText();
-        data[index][6] = c3ScoreField.getText();
-        data[index][7] = c3CommentField.getText();
-        data[index][8] = c4ScoreField.getText();
-        data[index][9] = c4CommentField.getText();
+        while(true){
+            int i=0;
+            if (data.get(i).get(0).equals(fullName)){
+                    index = i;
+                    gradeField.setText(grade);
+                    c1NameField.setText(c1);
+                    c2NameField.setText(c2);
+                    c3NameField.setText(c3);
+                    c4NameField.setText(c4);
+                    c1ScoreField.setText(data.get(i).get(2));
+                    c2ScoreField.setText(data.get(i).get(4));
+                    c3ScoreField.setText(data.get(i).get(6));
+                    c4ScoreField.setText(data.get(i).get(8));
+                    c1CommentField.setText(data.get(i).get(3));
+                    c2CommentField.setText(data.get(i).get(5));
+                    c3CommentField.setText(data.get(i).get(7));
+                    c4CommentField.setText(data.get(i).get(9));
+                    break;
+            }
+            i++;
+        }
     }//GEN-LAST:event_searchActionPerformed
 
     private void newStudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newStudentActionPerformed
         // TODO add your handling code here:
-        index++;
+        index = data.size()+1;
+        data.add(new ArrayList<>());
         gradeField.setText(grade);
         c1NameField.setText(c1);
         c2NameField.setText(c2);
@@ -543,6 +591,7 @@ public class MainEvent extends javax.swing.JFrame {
         c2CommentField.setText("");
         c3CommentField.setText("");
         c4CommentField.setText("");
+        newStudent.setEnabled(false);
     }//GEN-LAST:event_newStudentActionPerformed
 
     /**
@@ -586,22 +635,22 @@ public class MainEvent extends javax.swing.JFrame {
     private javax.swing.JTextField c1CommentField;
     private javax.swing.JTextField c1MedField;
     private javax.swing.JTextField c1NameField;
-    private javax.swing.JTextField c1ScoreField;
+    public static javax.swing.JTextField c1ScoreField;
     private javax.swing.JButton c2CalcButton;
     private javax.swing.JTextField c2CommentField;
     private javax.swing.JTextField c2MedField;
     private javax.swing.JTextField c2NameField;
-    private javax.swing.JTextField c2ScoreField;
+    public static javax.swing.JTextField c2ScoreField;
     private javax.swing.JButton c3CalcButton;
     private javax.swing.JTextField c3CommentField;
     private javax.swing.JTextField c3MedField;
     private javax.swing.JTextField c3NameField;
-    private javax.swing.JTextField c3ScoreField;
+    public static javax.swing.JTextField c3ScoreField;
     private javax.swing.JButton c4CalcButton;
     private javax.swing.JTextField c4CommentField;
     private javax.swing.JTextField c4MedField;
     private javax.swing.JTextField c4NameField;
-    private javax.swing.JTextField c4ScoreField;
+    public static javax.swing.JTextField c4ScoreField;
     private javax.swing.JTextField fNameField;
     private javax.swing.JTextField gradeField;
     private javax.swing.JLabel jLabel1;
@@ -618,12 +667,11 @@ public class MainEvent extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField lNameField;
     private javax.swing.JButton newStudent;
     private javax.swing.JButton saveButton;
     private javax.swing.JButton search;
-    private javax.swing.JList<String> studentList;
+    private javax.swing.JLabel studentDoesNotExist;
     private javax.swing.JTextField studentNumberField;
     // End of variables declaration//GEN-END:variables
 }
