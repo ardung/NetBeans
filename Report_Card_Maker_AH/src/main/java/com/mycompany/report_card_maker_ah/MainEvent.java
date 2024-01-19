@@ -548,8 +548,7 @@ public class MainEvent extends javax.swing.JFrame {
         fName = fNameField.getText();
         lName = lNameField.getText();
         fullName = fName.strip() + " " + lName.strip();
-        while(true){
-            int i=0;
+        for (int i=0;i<data.size()-1;i++){
             if (data.get(i).get(0).equals(fullName)){
                     index = i;
                     gradeField.setText(grade);
@@ -565,16 +564,15 @@ public class MainEvent extends javax.swing.JFrame {
                     c2CommentField.setText(data.get(i).get(5));
                     c3CommentField.setText(data.get(i).get(7));
                     c4CommentField.setText(data.get(i).get(9));
-                    break;
+                    return;
             }
-            i++;
         }
+        studentDoesNotExist.setVisible(true);
     }//GEN-LAST:event_searchActionPerformed
 
     private void newStudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newStudentActionPerformed
         // TODO add your handling code here:
-        index = data.size()+1;
-        data.add(new ArrayList<>());
+        index = data.size();
         gradeField.setText(grade);
         c1NameField.setText(c1);
         c2NameField.setText(c2);
@@ -592,6 +590,7 @@ public class MainEvent extends javax.swing.JFrame {
         c3CommentField.setText("");
         c4CommentField.setText("");
         newStudent.setEnabled(false);
+        studentDoesNotExist.setVisible(false);
     }//GEN-LAST:event_newStudentActionPerformed
 
     /**
