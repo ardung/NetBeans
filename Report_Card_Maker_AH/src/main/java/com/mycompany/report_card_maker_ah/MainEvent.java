@@ -5,23 +5,87 @@
 package com.mycompany.report_card_maker_ah;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.io.*;
 import java.util.*;
 import javax.swing.*;
+import org.apache.pdfbox.pdmodel.*;
+import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
+import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 /**
  *
  * @author 342513926
  */
 public class MainEvent extends javax.swing.JFrame {
-    String c1, c2, c3, c4, grade, fName, lName, fullName;
-    int index=0;
-    ArrayList<ArrayList<String>> data = new ArrayList<>();
-    
-    
+    static String c1, c2, c3, c4, grade, fName, lName, fullName;
+    double a1, a2, a3, a4;
+    static int index=0;
+    public static ArrayList<ArrayList<String>> data = new ArrayList<>();
+    public static DefaultListModel model;    
 
     /**
      * Creates new form NewJFrame
      */
     @SuppressWarnings("empty-statement")
+    
+    public static void updateFile(){
+        try {
+            FileWriter pw = new FileWriter("save.txt",false);
+            for (int i=0;i<data.size();i++){
+                for(int j=0;j<=8;j++){
+                pw.write(data.get(i).get(j) + "|");
+                } pw.write(data.get(i).get(9));
+                pw.write("~");
+            }
+            pw.write(c1);
+            pw.write("$");
+            pw.write(c2);
+            pw.write("$");
+            pw.write(c3);
+            pw.write("$");
+            pw.write(c4);
+            pw.write("$");
+            pw.write(grade);
+            pw.close();
+        } catch (IOException e){
+        }
+    }
+    public static boolean readFromFile(){
+        try {
+            File file = new File("save.txt");
+            Scanner input = new Scanner(file);
+            String[] parts1;
+            String line = "";
+            while (input.hasNextLine()){
+                line+=input.nextLine();
+            }
+            if (line.isEmpty()){
+                return true;
+            }
+            parts1 = line.split("~");
+            String[][] parts2 = new String[parts1.length][];
+            for (int i=0;i<parts1.length-1;i++){
+                parts2[i] = parts1[i].split("\\|");
+            } parts2[parts1.length-1] = parts1[parts1.length-1].split("\\$");
+            for (int i=0;i<parts2.length-1;i++){
+                data.add(new ArrayList<>());
+                for (int j=0;j<10;j++){
+                    data.get(i).add(j,parts2[i][j]);
+                }
+            }data.remove(data.size()-1);
+            for (int i=0;i<data.size();i++){
+                model.addElement(data.get(i).get(0));
+            }
+            c1 = parts2[parts2.length-1][0];
+            c2 = parts2[parts2.length-1][1];
+            c3 = parts2[parts2.length-1][2];
+            c4 = parts2[parts2.length-1][3];
+            grade = parts2[parts2.length-1][4];
+            index = data.size()-1;
+        } catch(FileNotFoundException e){
+        }
+        return false;
+    }
+    
     public static void Calculator(int ind){
         ArrayList<ArrayList<JTextField>> boxes = new ArrayList<>();
         JFrame calculator = new JFrame("");
@@ -72,19 +136,19 @@ public class MainEvent extends javax.swing.JFrame {
             boolean valid = true;
             for (int i=0;i<size;i++){
                 String gradeString,weightString;
-                double grade;
+                double score;
                 double weight;
                 if (boxes.get(i).get(0).getText().isEmpty() || 
                         boxes.get(i).get(1).getText().isEmpty()){
                         break;
                 }else{
                     gradeString = boxes.get(i).get(0).getText();
-                    grade = Double.parseDouble(gradeString);
+                    score = Double.parseDouble(gradeString);
                     weightString = boxes.get(i).get(1).getText();
                     weight = Double.parseDouble(weightString);
                 }
                 weightTotal+=weight;
-                finalGrade += grade*(weight/100.0);
+                finalGrade += score*(weight/100.0);
                 if (weightTotal>100){
                     valid = false;
                     break;
@@ -117,6 +181,18 @@ public class MainEvent extends javax.swing.JFrame {
     }
     public MainEvent() {
         initComponents();
+        studentList.setModel(model);
+        c1NameField.setText(c1);
+        c2NameField.setText(c2);
+        c3NameField.setText(c3);
+        c4NameField.setText(c4);
+        gradeField.setText(grade);
+        errorText.setText("");
+        if(readFromFile()){
+            saveButton.setEnabled(true);
+        }
+        export.setEnabled(false);
+        
     }
 
     /**
@@ -148,31 +224,35 @@ public class MainEvent extends javax.swing.JFrame {
         jPanel1 = new javax.swing.JPanel();
         c3NameField = new javax.swing.JTextField();
         c3ScoreField = new javax.swing.JTextField();
-        c3MedField = new javax.swing.JTextField();
+        c3AvgField = new javax.swing.JTextField();
         c3CommentField = new javax.swing.JTextField();
         c3CalcButton = new javax.swing.JButton();
         c4NameField = new javax.swing.JTextField();
         c4ScoreField = new javax.swing.JTextField();
         c4CalcButton = new javax.swing.JButton();
-        c4MedField = new javax.swing.JTextField();
+        c4AvgField = new javax.swing.JTextField();
         c4CommentField = new javax.swing.JTextField();
         c1NameField = new javax.swing.JTextField();
         c1ScoreField = new javax.swing.JTextField();
-        c1MedField = new javax.swing.JTextField();
+        c1AvgField = new javax.swing.JTextField();
         c1CommentField = new javax.swing.JTextField();
         c1CalcButton = new javax.swing.JButton();
         c2NameField = new javax.swing.JTextField();
         c2ScoreField = new javax.swing.JTextField();
         c2CalcButton = new javax.swing.JButton();
-        c2MedField = new javax.swing.JTextField();
+        c2AvgField = new javax.swing.JTextField();
         c2CommentField = new javax.swing.JTextField();
         saveButton = new javax.swing.JButton();
         newStudent = new javax.swing.JButton();
         search = new javax.swing.JButton();
-        studentDoesNotExist = new javax.swing.JLabel();
+        errorText = new javax.swing.JLabel();
+        jScrollPane2 = new javax.swing.JScrollPane();
+        studentList = new javax.swing.JList<>();
+        export = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Report Cards");
+        setResizable(false);
 
         jLabel1.setFont(new java.awt.Font("sansserif", 0, 18)); // NOI18N
         jLabel1.setText("Report Card Maker");
@@ -197,7 +277,7 @@ public class MainEvent extends javax.swing.JFrame {
 
         jLabel11.setText("Student #:");
 
-        jLabel12.setText("Median");
+        jLabel12.setText("Average");
 
         jLabel13.setText("Comments");
 
@@ -209,7 +289,7 @@ public class MainEvent extends javax.swing.JFrame {
             }
         });
 
-        c3MedField.setEditable(false);
+        c3AvgField.setEditable(false);
 
         c3CalcButton.setFont(new java.awt.Font("sansserif", 0, 8)); // NOI18N
         c3CalcButton.setText("Calc");
@@ -233,7 +313,7 @@ public class MainEvent extends javax.swing.JFrame {
             }
         });
 
-        c4MedField.setEditable(false);
+        c4AvgField.setEditable(false);
 
         c1NameField.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -241,7 +321,7 @@ public class MainEvent extends javax.swing.JFrame {
             }
         });
 
-        c1MedField.setEditable(false);
+        c1AvgField.setEditable(false);
 
         c1CalcButton.setFont(new java.awt.Font("sansserif", 0, 8)); // NOI18N
         c1CalcButton.setText("Calc");
@@ -265,9 +345,10 @@ public class MainEvent extends javax.swing.JFrame {
             }
         });
 
-        c2MedField.setEditable(false);
+        c2AvgField.setEditable(false);
 
         saveButton.setText("Save");
+        saveButton.setEnabled(false);
         saveButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 saveButtonActionPerformed(evt);
@@ -289,9 +370,22 @@ public class MainEvent extends javax.swing.JFrame {
             }
         });
 
-        studentDoesNotExist.setForeground(new java.awt.Color(255, 51, 51));
-        studentDoesNotExist.setText("Student does not exist.");
-        studentDoesNotExist.setVisible(false);
+        errorText.setForeground(new java.awt.Color(255, 51, 51));
+        errorText.setText("ErrorText");
+
+        studentList.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                studentListMouseClicked(evt);
+            }
+        });
+        jScrollPane2.setViewportView(studentList);
+
+        export.setText("Export");
+        export.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                exportActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -304,7 +398,12 @@ public class MainEvent extends javax.swing.JFrame {
                         .addComponent(saveButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(newStudent)
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(search)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(errorText)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(export))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -321,19 +420,12 @@ public class MainEvent extends javax.swing.JFrame {
                                 .addComponent(jLabel2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(fNameField, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jLabel1)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(187, 187, 187))
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(search)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(studentDoesNotExist)
-                                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(81, 81, 81)
+                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 100, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
@@ -346,10 +438,11 @@ public class MainEvent extends javax.swing.JFrame {
                                 .addGap(74, 74, 74)
                                 .addComponent(jLabel13))
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jLabel4)
-                                    .addComponent(jLabel5)
-                                    .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                                        .addComponent(jLabel4)
+                                        .addComponent(jLabel7, javax.swing.GroupLayout.Alignment.TRAILING))
+                                    .addComponent(jLabel5, javax.swing.GroupLayout.Alignment.TRAILING))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
@@ -357,7 +450,7 @@ public class MainEvent extends javax.swing.JFrame {
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(c4ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                        .addComponent(c4MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addComponent(c4AvgField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addComponent(c4CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -369,13 +462,13 @@ public class MainEvent extends javax.swing.JFrame {
                                                 .addGap(12, 12, 12)
                                                 .addComponent(c2ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(c2MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                                .addComponent(c2AvgField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE))
                                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                                 .addComponent(c1NameField, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addGap(12, 12, 12)
                                                 .addComponent(c1ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                                .addComponent(c1MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                                .addComponent(c1AvgField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                                             .addComponent(c2CommentField, javax.swing.GroupLayout.DEFAULT_SIZE, 164, Short.MAX_VALUE)
@@ -391,12 +484,13 @@ public class MainEvent extends javax.swing.JFrame {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(c3ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(c3MedField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(c3AvgField, javax.swing.GroupLayout.PREFERRED_SIZE, 62, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(c3CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, 164, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(c3CalcButton, javax.swing.GroupLayout.PREFERRED_SIZE, 72, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {c1CalcButton, c2CalcButton, c3CalcButton, c4CalcButton});
@@ -404,62 +498,61 @@ public class MainEvent extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(fNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jLabel2)
-                    .addComponent(search)
-                    .addComponent(studentDoesNotExist))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel3)
-                    .addComponent(lNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel1)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel10)
-                            .addComponent(gradeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addComponent(fNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel2))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(studentNumberField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel11))))
+                            .addComponent(jLabel3)
+                            .addComponent(lNameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jLabel10)
+                                    .addComponent(gradeField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(studentNumberField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(jLabel11)))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jScrollPane2)))
                 .addGap(29, 29, 29)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jLabel8)
                     .addComponent(jLabel9)
                     .addComponent(jLabel12)
                     .addComponent(jLabel13, javax.swing.GroupLayout.Alignment.LEADING))
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(55, 55, 55)
-                        .addComponent(jLabel5))
-                    .addGroup(layout.createSequentialGroup()
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(c1NameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(c1ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(c1CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(c1CalcButton)
-                            .addComponent(c1MedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(jLabel4))
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(c2NameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(c2ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(c2CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(c2CalcButton)
-                            .addComponent(c2MedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(c1NameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(c1ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(c1CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(c1CalcButton)
+                    .addComponent(c1AvgField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
                 .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(c2NameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(c2ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(c2CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(c2CalcButton)
+                    .addComponent(c2AvgField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel5))
+                .addGap(21, 21, 21)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel6)
                     .addComponent(c3NameField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(c3ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(c3CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(c3CalcButton)
-                    .addComponent(c3MedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(c3AvgField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel7)
@@ -467,11 +560,14 @@ public class MainEvent extends javax.swing.JFrame {
                     .addComponent(c4ScoreField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(c4CommentField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(c4CalcButton)
-                    .addComponent(c4MedField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                    .addComponent(c4AvgField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(13, 13, 13)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(saveButton)
-                    .addComponent(newStudent))
+                    .addComponent(newStudent)
+                    .addComponent(search)
+                    .addComponent(errorText)
+                    .addComponent(export))
                 .addContainerGap())
         );
 
@@ -516,39 +612,90 @@ public class MainEvent extends javax.swing.JFrame {
 
     private void saveButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_saveButtonActionPerformed
         // TODO add your handling code here:
-        data.add(new ArrayList<>());
-        c1 = c1NameField.getText();
-        c2 = c2NameField.getText();
-        c3 = c3NameField.getText();
-        c4 = c4NameField.getText();
-        grade = gradeField.getText();
-        fName = fNameField.getText();
-        lName = lNameField.getText();
-        fullName = fName.strip() + " " + lName.strip();
-        data.get(index).add(0, fullName);
-        data.get(index).add(1, studentNumberField.getText());
-        data.get(index).add(2, c1ScoreField.getText());
-        data.get(index).add(3,c1CommentField.getText());
-        data.get(index).add(4,c2ScoreField.getText());
-        data.get(index).add(5,c2CommentField.getText());
-        data.get(index).add(6,c3ScoreField.getText());
-        data.get(index).add(7,c3CommentField.getText());
-        data.get(index).add(8,c4ScoreField.getText());
-        data.get(index).add(9, c4CommentField.getText());
-        newStudent.setEnabled(true);
-        
-        
-        
-        
-        
+        if (!c1ScoreField.getText().isEmpty() || !c2ScoreField.getText().isEmpty() || !c3ScoreField.getText().isEmpty() || !c4ScoreField.getText().isEmpty()){
+            try{
+            Double.valueOf(c1ScoreField.getText());
+            Double.valueOf(c2ScoreField.getText());
+            Double.valueOf(c3ScoreField.getText());
+            Double.valueOf(c4ScoreField.getText());
+            } catch(NumberFormatException e){
+                errorText.setText("Course grade must be a number");
+                return;
+            }
+        }
+        if (!fNameField.getText().isEmpty() || !lNameField.getText().isEmpty()){
+            c1 = c1NameField.getText();
+            c2 = c2NameField.getText();
+            c3 = c3NameField.getText();
+            c4 = c4NameField.getText();
+            grade = gradeField.getText();
+            fName = fNameField.getText();
+            lName = lNameField.getText();
+            a1=0; a2=0; a3=0; a4=0;
+            fullName = fName.replaceAll("\\s","") + " " + lName.replaceAll("\\s","");
+            for (int i=0;i<data.size()-1;i++){
+                if (data.get(i).get(0).equals(fullName) && i!=index){
+                    errorText.setText("There cannot be duplicate names");
+                    return;
+                }
+            }
+            data.get(index).add(0, fullName);
+            data.get(index).add(1, studentNumberField.getText());
+            data.get(index).add(2, c1ScoreField.getText());
+            data.get(index).add(3,c1CommentField.getText());
+            data.get(index).add(4,c2ScoreField.getText());
+            data.get(index).add(5,c2CommentField.getText());
+            data.get(index).add(6,c3ScoreField.getText());
+            data.get(index).add(7,c3CommentField.getText());
+            data.get(index).add(8,c4ScoreField.getText());
+            data.get(index).add(9, c4CommentField.getText());
+            for (int i=0;i<data.size();i++){
+                try{
+                a1+=Double.valueOf(data.get(i).get(2));
+                a2+=Double.valueOf(data.get(i).get(4));
+                a3+=Double.valueOf(data.get(i).get(6));
+                a4+=Double.valueOf(data.get(i).get(8));
+                } catch(NumberFormatException e){
+                    break;
+                }
+            }
+            c1AvgField.setText(String.valueOf((Math.round((a1/(data.size()))*10))/10.0));
+            c2AvgField.setText(String.valueOf((Math.round((a2/(data.size()))*10))/10.0));
+            c3AvgField.setText(String.valueOf((Math.round((a3/(data.size()))*10))/10.0));
+            c4AvgField.setText(String.valueOf((Math.round((a4/(data.size()))*10))/10.0));
+            newStudent.setEnabled(true);
+            search.setEnabled(true);
+            errorText.setText("");
+            model.clear();
+            for (int i=0;i<data.size();i++){
+                model.addElement(data.get(i).get(0));
+            }
+            studentList.setModel(model);
+            updateFile();
+            if (!(fNameField.getText().isEmpty() || lNameField.getText().isEmpty() || gradeField.getText().isEmpty() || 
+                    studentNumberField.getText().isEmpty() || c1NameField.getText().isEmpty() || c2NameField.getText().isEmpty() || c3NameField.getText().isEmpty() || c4NameField.getText().isEmpty() || 
+                    c1ScoreField.getText().isEmpty() || c2ScoreField.getText().isEmpty() || c3ScoreField.getText().isEmpty() || c4ScoreField.getText().isEmpty() || 
+                    c1AvgField.getText().isEmpty() || c2AvgField.getText().isEmpty() || c3AvgField.getText().isEmpty() || c4AvgField.getText().isEmpty() || 
+                    c1CommentField.getText().isEmpty() || c2CommentField.getText().isEmpty() ||c3CommentField.getText().isEmpty() || c4CommentField.getText().isEmpty())){
+                export.setEnabled(true);
+                return;
+            }
+            export.setEnabled(false);
+            }
+            errorText.setText("Name cannot be empty");
     }//GEN-LAST:event_saveButtonActionPerformed
 
     private void searchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_searchActionPerformed
         // TODO add your handling code here:
+        if (fNameField.getText().isEmpty() || lNameField.getText().isEmpty()){
+            errorText.setText("Name cannot be empty");
+            return;
+        }
+        
         fName = fNameField.getText();
         lName = lNameField.getText();
-        fullName = fName.strip() + " " + lName.strip();
-        for (int i=0;i<data.size()-1;i++){
+        fullName = fName.replaceAll("\\s","") + " " + lName.replaceAll("\\s","");
+        for (int i=0;i<data.size();i++){
             if (data.get(i).get(0).equals(fullName)){
                     index = i;
                     gradeField.setText(grade);
@@ -556,6 +703,7 @@ public class MainEvent extends javax.swing.JFrame {
                     c2NameField.setText(c2);
                     c3NameField.setText(c3);
                     c4NameField.setText(c4);
+                    studentNumberField.setText(data.get(i).get(1));
                     c1ScoreField.setText(data.get(i).get(2));
                     c2ScoreField.setText(data.get(i).get(4));
                     c3ScoreField.setText(data.get(i).get(6));
@@ -564,15 +712,18 @@ public class MainEvent extends javax.swing.JFrame {
                     c2CommentField.setText(data.get(i).get(5));
                     c3CommentField.setText(data.get(i).get(7));
                     c4CommentField.setText(data.get(i).get(9));
+                    errorText.setText("");
+                    saveButton.setEnabled(true);
                     return;
             }
         }
-        studentDoesNotExist.setVisible(true);
+        errorText.setText("Student does not exist");
     }//GEN-LAST:event_searchActionPerformed
 
     private void newStudentActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_newStudentActionPerformed
         // TODO add your handling code here:
-        index = data.size();
+        data.add(new ArrayList<>());
+        index = data.size()-1;
         gradeField.setText(grade);
         c1NameField.setText(c1);
         c2NameField.setText(c2);
@@ -590,8 +741,66 @@ public class MainEvent extends javax.swing.JFrame {
         c3CommentField.setText("");
         c4CommentField.setText("");
         newStudent.setEnabled(false);
-        studentDoesNotExist.setVisible(false);
+        search.setEnabled(false);
+        errorText.setText("");
     }//GEN-LAST:event_newStudentActionPerformed
+
+    private void studentListMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_studentListMouseClicked
+        // TODO add your handling code here:
+        String[] part;
+        part = studentList.getSelectedValue().split(" ");
+        fNameField.setText(part[0]);
+        lNameField.setText(part[1]);
+    }//GEN-LAST:event_studentListMouseClicked
+
+    private void exportActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_exportActionPerformed
+        // TODO add your handling code here:
+        try {
+            PDDocument pDDocument = PDDocument.load(new File("template.pdf"));
+            PDAcroForm pDAcroForm = pDDocument.getDocumentCatalog().getAcroForm();
+            PDField field = pDAcroForm.getField("pName");
+            field.setValue(lName+", "+fName);
+            field = pDAcroForm.getField("pNum");
+            field.setValue(data.get(index).get(1));
+            field = pDAcroForm.getField("pGrade");
+            field.setValue(grade);
+            field = pDAcroForm.getField("pC1");
+            field.setValue(c1);
+            field = pDAcroForm.getField("pC2");
+            field.setValue(c2);
+            field = pDAcroForm.getField("pC3");
+            field.setValue(c3);
+            field = pDAcroForm.getField("pC4");
+            field.setValue(c4);
+            field = pDAcroForm.getField("pC1Score");
+            field.setValue(data.get(index).get(2));
+            field = pDAcroForm.getField("pC2Score");
+            field.setValue(data.get(index).get(4));
+            field = pDAcroForm.getField("pC3Score");
+            field.setValue(data.get(index).get(6));
+            field = pDAcroForm.getField("pC4Score");
+            field.setValue(data.get(index).get(8));
+            field = pDAcroForm.getField("pC1Avg");
+            field.setValue(c1AvgField.getText());
+            field = pDAcroForm.getField("pC2Avg");
+            field.setValue(c2AvgField.getText());
+            field = pDAcroForm.getField("pC3Avg");
+            field.setValue(c3AvgField.getText());
+            field = pDAcroForm.getField("pC4Avg");
+            field.setValue(c4AvgField.getText());
+            field = pDAcroForm.getField("pC1Com");
+            field.setValue(data.get(index).get(3));
+            field = pDAcroForm.getField("pC2Com");
+            field.setValue(data.get(index).get(5));
+            field = pDAcroForm.getField("pC3Com");
+            field.setValue(data.get(index).get(7));
+            field = pDAcroForm.getField("pC4Com");
+            field.setValue(data.get(index).get(9));
+            pDDocument.save("Export/ReportCard_"+fullName+".pdf");
+            pDDocument.close();
+        } catch (IOException e) {
+        }
+    }//GEN-LAST:event_exportActionPerformed
 
     /**
      * @param args the command line arguments
@@ -620,38 +829,39 @@ public class MainEvent extends javax.swing.JFrame {
         }
         //</editor-fold>
         //</editor-fold>
-
-        /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MainEvent().setVisible(true);
-            }
+        data.add(new ArrayList<>());
+        model = new DefaultListModel<>();               /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> {
+            new MainEvent().setVisible(true);
         });
     }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JTextField c1AvgField;
     private javax.swing.JButton c1CalcButton;
     private javax.swing.JTextField c1CommentField;
-    private javax.swing.JTextField c1MedField;
-    private javax.swing.JTextField c1NameField;
+    private static javax.swing.JTextField c1NameField;
     public static javax.swing.JTextField c1ScoreField;
+    private javax.swing.JTextField c2AvgField;
     private javax.swing.JButton c2CalcButton;
     private javax.swing.JTextField c2CommentField;
-    private javax.swing.JTextField c2MedField;
-    private javax.swing.JTextField c2NameField;
+    private static javax.swing.JTextField c2NameField;
     public static javax.swing.JTextField c2ScoreField;
+    private javax.swing.JTextField c3AvgField;
     private javax.swing.JButton c3CalcButton;
     private javax.swing.JTextField c3CommentField;
-    private javax.swing.JTextField c3MedField;
-    private javax.swing.JTextField c3NameField;
+    private static javax.swing.JTextField c3NameField;
     public static javax.swing.JTextField c3ScoreField;
+    private javax.swing.JTextField c4AvgField;
     private javax.swing.JButton c4CalcButton;
     private javax.swing.JTextField c4CommentField;
-    private javax.swing.JTextField c4MedField;
-    private javax.swing.JTextField c4NameField;
+    private static javax.swing.JTextField c4NameField;
     public static javax.swing.JTextField c4ScoreField;
+    public static javax.swing.JLabel errorText;
+    private javax.swing.JButton export;
     private javax.swing.JTextField fNameField;
-    private javax.swing.JTextField gradeField;
+    private static javax.swing.JTextField gradeField;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
     private javax.swing.JLabel jLabel11;
@@ -666,11 +876,12 @@ public class MainEvent extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel8;
     private javax.swing.JLabel jLabel9;
     private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTextField lNameField;
-    private javax.swing.JButton newStudent;
-    private javax.swing.JButton saveButton;
-    private javax.swing.JButton search;
-    private javax.swing.JLabel studentDoesNotExist;
+    private static javax.swing.JButton newStudent;
+    private static javax.swing.JButton saveButton;
+    private static javax.swing.JButton search;
+    private static javax.swing.JList<String> studentList;
     private javax.swing.JTextField studentNumberField;
     // End of variables declaration//GEN-END:variables
 }
